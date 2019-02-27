@@ -13,12 +13,9 @@ class ByteSerializer : PrimitiveSerializer<Byte>() {
     }
 }
 
-/*
-* short not work
-* */
 class ShortSerializer : PrimitiveSerializer<Short>() {
     override fun deserialize(decoder: Decoder): Data<Short> {
-        return Data(4)
+        return Data(Short.MIN_VALUE.rangeTo(Short.MAX_VALUE).random().toShort())
     }
 }
 
@@ -30,7 +27,7 @@ class IntSerializer : PrimitiveSerializer<Int>() {
 
 class LongSerializer : PrimitiveSerializer<Long>() {
     override fun deserialize(decoder: Decoder): Data<Long> {
-        return Data((Long.MIN_VALUE..Long.MAX_VALUE).random())
+        return Data(Random.nextLong())
     }
 }
 
@@ -51,10 +48,11 @@ class BooleanSerializer : PrimitiveSerializer<Boolean>() {
         return Data(Random.nextBoolean())
     }
 }
-
+/*
+Need to find library for generate random with Null
+ */
 class NullSerializer : PrimitiveSerializer<Double>() {
     override fun deserialize(decoder: Decoder): Data<Double> {
         return Data(Random.nextDouble())
     }
 }
-
