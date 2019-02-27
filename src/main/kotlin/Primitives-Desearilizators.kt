@@ -1,44 +1,60 @@
 import kotlinx.serialization.Decoder
+import kotlin.random.Random
 
-object CharSerializer : PrimitiveSerializer<Char>() {
+class CharSerializer : PrimitiveSerializer<Char>() {
     override fun deserialize(decoder: Decoder): Data<Char> {
         return Data((Char.MIN_VALUE..Char.MAX_VALUE).random())
     }
 }
 
-object ByteSerializer : PrimitiveSerializer<Byte>() {
+class ByteSerializer : PrimitiveSerializer<Byte>() {
     override fun deserialize(decoder: Decoder): Data<Byte> {
-        return Data(1)
+        return Data(Random.nextBytes(1)[0])
     }
 }
 
-/*object ShortSerializer : PrimitiveSerializer<Short>() {
-override fun deserialize(decoder: Decoder): Data<Short> {
-return Data((Short.MIN_VALUE..Short.MAX_VALUE).random())
+/*
+* short not work
+* */
+class ShortSerializer : PrimitiveSerializer<Short>() {
+    override fun deserialize(decoder: Decoder): Data<Short> {
+        return Data(4)
+    }
 }
-}*/
 
-object IntSerializer : PrimitiveSerializer<Int>() {
+class IntSerializer : PrimitiveSerializer<Int>() {
     override fun deserialize(decoder: Decoder): Data<Int> {
         return Data((Int.MIN_VALUE..Int.MAX_VALUE).random())
     }
 }
 
-object LongSerializer : PrimitiveSerializer<Long>() {
+class LongSerializer : PrimitiveSerializer<Long>() {
     override fun deserialize(decoder: Decoder): Data<Long> {
         return Data((Long.MIN_VALUE..Long.MAX_VALUE).random())
     }
 }
 
-/*object FloatSerializer : PrimitiveSerializer<Int>() {
-override fun deserialize(decoder: Decoder): Data<Int> {
-return Data((Int.MIN_VALUE..Int.MAX_VALUE).random())
+class FloatSerializer : PrimitiveSerializer<Float>() {
+    override fun deserialize(decoder: Decoder): Data<Float> {
+        return Data(Random.nextFloat())
+    }
 }
-}*/
 
-/*class IntSerializer : PrimitiveSerializer<Int>() {
-override fun deserialize(decoder: Decoder): Data<Int> {
-return Data((Int.MIN_VALUE..Int.MAX_VALUE).random())
+class DoubleSerializer : PrimitiveSerializer<Double>() {
+    override fun deserialize(decoder: Decoder): Data<Double> {
+        return Data(Random.nextDouble())
+    }
 }
-}*/
+
+class BooleanSerializer : PrimitiveSerializer<Boolean>() {
+    override fun deserialize(decoder: Decoder): Data<Boolean> {
+        return Data(Random.nextBoolean())
+    }
+}
+
+class NullSerializer : PrimitiveSerializer<Double>() {
+    override fun deserialize(decoder: Decoder): Data<Double> {
+        return Data(Random.nextDouble())
+    }
+}
 
