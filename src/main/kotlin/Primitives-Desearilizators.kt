@@ -1,58 +1,81 @@
 import kotlinx.serialization.Decoder
+import kotlinx.serialization.Encoder
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialDescriptor
 import kotlin.random.Random
 
-class CharSerializer : PrimitiveSerializer<Char>() {
-    override fun deserialize(decoder: Decoder): Data<Char> {
-        return Data((Char.MIN_VALUE..Char.MAX_VALUE).random())
+sealed class PrimitiveSerializer<T> : KSerializer<T> {
+    override fun serialize(encoder: Encoder, obj: T) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override val descriptor: SerialDescriptor
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+}
+
+object MyStringSerializer : PrimitiveSerializer<String>() {
+    private const val source = "ABCDEFGHIJKLMNOPQRSTUVWXYZ \t\n"
+    override fun deserialize(decoder: Decoder): String{
+        return (1..100).map { Random.nextInt(0, source.length)  }
+            .map { source[it] }
+            .joinToString("")
     }
 }
 
-class ByteSerializer : PrimitiveSerializer<Byte>() {
-    override fun deserialize(decoder: Decoder): Data<Byte> {
-        return Data(Random.nextBytes(1)[0])
+object CharSerializer : PrimitiveSerializer<Char>() {
+    override fun deserialize(decoder: Decoder): Char {
+        return (Char.MIN_VALUE..Char.MAX_VALUE).random()
     }
 }
 
-class ShortSerializer : PrimitiveSerializer<Short>() {
-    override fun deserialize(decoder: Decoder): Data<Short> {
-        return Data(Short.MIN_VALUE.rangeTo(Short.MAX_VALUE).random().toShort())
+object ByteSerializer : PrimitiveSerializer<Byte>() {
+    override fun deserialize(decoder: Decoder): Byte {
+        return Random.nextBytes(1)[0]
     }
 }
 
-class IntSerializer : PrimitiveSerializer<Int>() {
-    override fun deserialize(decoder: Decoder): Data<Int> {
-        return Data((Int.MIN_VALUE..Int.MAX_VALUE).random())
+object ShortSerializer : PrimitiveSerializer<Short>() {
+    override fun deserialize(decoder: Decoder): Short {
+        return Short.MIN_VALUE.rangeTo(Short.MAX_VALUE).random().toShort()
     }
 }
 
-class LongSerializer : PrimitiveSerializer<Long>() {
-    override fun deserialize(decoder: Decoder): Data<Long> {
-        return Data(Random.nextLong())
+object IntSerializer : PrimitiveSerializer<Int>() {
+    override fun deserialize(decoder: Decoder): Int {
+        return (Int.MIN_VALUE..Int.MAX_VALUE).random()
     }
 }
 
-class FloatSerializer : PrimitiveSerializer<Float>() {
-    override fun deserialize(decoder: Decoder): Data<Float> {
-        return Data(Random.nextFloat())
+object LongSerializer : PrimitiveSerializer<Long>() {
+    override fun deserialize(decoder: Decoder): Long {
+        return Random.nextLong()
     }
 }
 
-class DoubleSerializer : PrimitiveSerializer<Double>() {
-    override fun deserialize(decoder: Decoder): Data<Double> {
-        return Data(Random.nextDouble())
+object FloatSerializer : PrimitiveSerializer<Float>() {
+    override fun deserialize(decoder: Decoder): Float {
+        return Random.nextFloat()
     }
 }
 
-class BooleanSerializer : PrimitiveSerializer<Boolean>() {
-    override fun deserialize(decoder: Decoder): Data<Boolean> {
-        return Data(Random.nextBoolean())
+object DoubleSerializer : PrimitiveSerializer<Double>() {
+    override fun deserialize(decoder: Decoder): Double {
+        return Random.nextDouble()
     }
 }
+
+object MyBooleanSerializer : PrimitiveSerializer<Boolean>() {
+    override fun deserialize(decoder: Decoder): Boolean {
+        return Random.nextBoolean()
+    }
+}
+
 /*
 Need to find library for generate random with Null
  */
-class NullSerializer : PrimitiveSerializer<Double>() {
+/*
+object NullSerializer : PrimitiveSerializer<Double>() {
     override fun deserialize(decoder: Decoder): Data<Double> {
         return Data(Random.nextDouble())
-    }
-}
+    }*/
+
