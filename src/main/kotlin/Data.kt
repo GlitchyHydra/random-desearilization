@@ -3,7 +3,6 @@ import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.json.Json
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import javax.activation.UnsupportedDataTypeException
 
 @Serializable
 data class Data<T>(val primitive: T) {
@@ -27,11 +26,28 @@ data class Data<T>(val primitive: T) {
     }
 }
 
+class MyElementDescriptor() : SerialDescriptor  {
+    override fun isElementOptional(index: Int): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
-@Suppress("IMPLICIT_CAST_TO_ANY", "JAVA_CLASS_ON_COMPANION")
-open class PrimitiveRandom<T : Any> {
+    override fun getElementName(index: Int): String = "primitive"
 
-    companion object {
+    override fun getElementIndex(name: String): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override val name: String
+        get() = "Data"
+    override val kind: SerialKind
+        get() = PrimitiveKind.UNIT
+
+}
+
+
+    @Suppress("IMPLICIT_CAST_TO_ANY")
+    class PrimitiveRandom {
+        companion object {
         fun getRandomString() =
             Json.unquoted.parse(Data.serializer(MyStringSerializer), """{primitive:}""")
 
@@ -59,25 +75,29 @@ open class PrimitiveRandom<T : Any> {
         fun getRandomBoolean() =
             Json.unquoted.parse(Data.serializer(MyBooleanSerializer), """{primitive:}""")
         //fun getRandomNull()
-    }
+    }}
 
-    @Deprecated("This dont working properly")
+/*
+    @PublishedApi
     @Suppress("UNCHECKED_CAST")
-    inline fun <reified T : Any> generateByDeserialize(): Data<T> = when (T::class) {
-        String::class -> Json.unquoted.parse(Data.serializer(MyStringSerializer), """{primitive:}""")
-        Char::class -> Json.unquoted.parse(Data.serializer(CharSerializer), """{primitive:}""")
-        Double::class -> Json.unquoted.parse(Data.serializer(DoubleSerializer), """{primitive:}""")
-        Float::class -> Json.unquoted.parse(Data.serializer(FloatSerializer), """{primitive:}""")
-        Long::class -> Json.unquoted.parse(Data.serializer(LongSerializer), """{primitive:}""")
-        Int::class -> Json.unquoted.parse(Data.serializer(IntSerializer), """{primitive:}""")
-        Short::class -> Json.unquoted.parse(Data.serializer(ShortSerializer), """{primitive:}""")
-        Byte::class -> Json.unquoted.parse(Data.serializer(ByteSerializer), """{primitive:}""")
-        Boolean::class -> Json.unquoted.parse(Data.serializer(MyBooleanSerializer), """{primitive:}""")
-        //Unit::class -> UnitSerializer
-        else -> null
-    } as Data<T>
+    internal fun <T : Any> PrimitiveRandom<T>.generateByDeserialize(classInstance: KClass<T>): Data<T>? =
+        when (classInstance) {
+            String::class -> Json.unquoted.parse(Data.serializer(MyStringSerializer), """{primitive:}""")
+            Char::class -> Json.unquoted.parse(Data.serializer(CharSerializer), """{primitive:}""")
+            Double::class -> Json.unquoted.parse(Data.serializer(DoubleSerializer), """{primitive:}""")
+            Float::class -> Json.unquoted.parse(Data.serializer(FloatSerializer), """{primitive:}""")
+            Long::class -> Json.unquoted.parse(Data.serializer(LongSerializer), """{primitive:}""")
+            Int::class -> Json.unquoted.parse(Data.serializer(IntSerializer), """{primitive:}""")
+            Short::class -> Json.unquoted.parse(Data.serializer(ShortSerializer), """{primitive:}""")
+            Byte::class -> Json.unquoted.parse(Data.serializer(ByteSerializer), """{primitive:}""")
+            Boolean::class -> Json.unquoted.parse(Data.serializer(MyBooleanSerializer), """{primitive:}""")
+            //Unit::class -> UnitSerializer
+            else -> null
+        } as Data<T>?
 
-}
+    inline fun <reified T : Any> PrimitiveRandom<T>.generateByDeserialize(): Data<T>? =
+        generateByDeserialize(T::class)
+}*/
 
 abstract class TypeReference<T> : Comparable<TypeReference<T>> {
     val type: Type =
