@@ -17,8 +17,7 @@ sealed class PrimitiveSerializer<T> : KSerializer<T> {
 object MyStringSerializer : PrimitiveSerializer<String>() {
     private const val source = "ABCDEFGHIJKLMNOPQRSTUVWXYZ \t\n"
     override fun deserialize(decoder: Decoder): String{
-        val decoder = decoder.beginStructure(descriptor)
-        decoder.endStructure(descriptor)
+        //decoder.beginStructure(descriptor).endStructure(descriptor)
         return (1..100).map { Random.nextInt(0, source.length)  }
             .map { source[it] }
             .joinToString("")
@@ -27,64 +26,56 @@ object MyStringSerializer : PrimitiveSerializer<String>() {
 
 object CharSerializer : PrimitiveSerializer<Char>() {
     override fun deserialize(decoder: Decoder): Char {
-        val decoder = decoder.beginStructure(descriptor)
-        decoder.endStructure(descriptor)
+        //decoder.beginStructure(descriptor).endStructure(descriptor)
         return (Char.MIN_VALUE..Char.MAX_VALUE).random()
     }
 }
 
 object ByteSerializer : PrimitiveSerializer<Byte>() {
     override fun deserialize(decoder: Decoder): Byte {
-        val decoder = decoder.beginStructure(descriptor)
-        decoder.endStructure(descriptor)
+        //decoder.beginStructure(descriptor).endStructure(descriptor)
         return Random.nextBytes(1)[0]
     }
 }
 
 object ShortSerializer : PrimitiveSerializer<Short>() {
     override fun deserialize(decoder: Decoder): Short {
-        val decoder = decoder.beginStructure(descriptor)
-        decoder.endStructure(descriptor)
+        //decoder.beginStructure(descriptor).endStructure(descriptor)
         return Short.MIN_VALUE.rangeTo(Short.MAX_VALUE).random().toShort()
     }
 }
 
 object IntSerializer : PrimitiveSerializer<Int>() {
     override fun deserialize(decoder: Decoder): Int {
-        val decoder = decoder.beginStructure(descriptor)
-        decoder.endStructure(descriptor)
+        //decoder.beginStructure(descriptor).endStructure(descriptor)
         return (Int.MIN_VALUE..Int.MAX_VALUE).random()
     }
 }
 
 object LongSerializer : PrimitiveSerializer<Long>() {
     override fun deserialize(decoder: Decoder): Long {
-        val decoder = decoder.beginStructure(descriptor)
-        decoder.endStructure(descriptor)
+        //decoder.beginStructure(descriptor).endStructure(descriptor)
         return Random.nextLong()
     }
 }
 
 object FloatSerializer : PrimitiveSerializer<Float>() {
     override fun deserialize(decoder: Decoder): Float {
-        val decoder = decoder.beginStructure(descriptor)
-        decoder.endStructure(descriptor)
+        //decoder.beginStructure(descriptor).endStructure(descriptor)
         return Random.nextFloat()
     }
 }
 
 object DoubleSerializer : PrimitiveSerializer<Double>() {
     override fun deserialize(decoder: Decoder): Double {
-        val decoder = decoder.beginStructure(descriptor)
-        decoder.endStructure(descriptor)
+        //decoder.beginStructure(descriptor).endStructure(descriptor)
         return Random.nextDouble()
     }
 }
 
 object MyBooleanSerializer : PrimitiveSerializer<Boolean>() {
     override fun deserialize(decoder: Decoder): Boolean {
-        val decoder = decoder.beginStructure(descriptor)
-        decoder.endStructure(descriptor)
+        //decoder.beginStructure(descriptor).endStructure(descriptor)
         return Random.nextBoolean()
     }
 }

@@ -56,7 +56,7 @@ sealed class AbstractCollectionSerializer<TElement, TCollection, TBuilder>: KSer
     }
 }
 
-sealed class ListLikeSerializer<TElement, TCollection, TBuilder>(val elementSerializer: KSerializer<TElement>) :
+sealed class ListLikeSerializer<TElement, TCollection, TBuilder>(private val elementSerializer: KSerializer<TElement>) :
     AbstractCollectionSerializer<TElement, TCollection, TBuilder>() {
 
     abstract fun TBuilder.insert(index: Int, element: TElement)
@@ -124,7 +124,7 @@ class SetSerializer<E>(private val eSerializer: KSerializer<E>) : ListLikeSerial
 
     override fun deserialize(decoder: Decoder): Set<E> {
         decoder.beginStructure(descriptor).endStructure(descriptor)
-        return List(10) { Json.parse(eSerializer, """{}""")}.toSet()
+        return List(10) { Json.parse(eSerializer, """""")}.toSet()
     }
 
     override val descriptor = HashSetClassDesc(eSerializer.descriptor)
@@ -143,7 +143,7 @@ class ArrayListSerializer<E>(private val element: KSerializer<E>) : ListLikeSeri
 
     override fun deserialize(decoder: Decoder): List<E> {
         decoder.beginStructure(descriptor).endStructure(descriptor)
-        return List(10) { Json.parse(element, """{}""")}
+        return List(10) { Json.parse(element, """""")}
     }
 
     override val descriptor = ArrayListClassDesc(element.descriptor)
@@ -163,9 +163,11 @@ class MapSerializer<K, V>(private val kSerializer: KSerializer<K>,
                           private val vSerializer: KSerializer<V>) :
     MapLikeSerializer<K, V, Map<K, V>, HashMap<K, V>>(kSerializer, vSerializer) {
     override fun deserialize(decoder: Decoder): Map<K, V> {
-        //decoder.beginStructure(descriptor).endStructure(descriptor)
-        return List(10) { Json.parse(kSerializer, """{}""")}
-            .zip(List(10) { Json.parse(vSerializer, """{}""")}).toMap()
+        /*decoder.beginStructure(descriptor.keyDescriptor).endStructure(descriptor.keyDescriptor)
+        decoder.beginStructure(descriptor.valueDescriptor).endStructure(descriptor.valueDescriptor)
+        decoder.beginStructure(descriptor).endStructure(descriptor)*/
+        return List(10) { Json.parse(kSerializer, """""")}
+            .zip(List(10) { Json.parse(vSerializer, """""")}).toMap()
     }
 
     override val descriptor = HashMapClassDesc(kSerializer.descriptor, vSerializer.descriptor)
@@ -179,65 +181,3 @@ class MapSerializer<K, V>(private val kSerializer: KSerializer<K>,
     override fun HashMap<K, V>.checkCapacity(size: Int) {}
     override fun HashMap<K, V>.insertKeyValuePair(index: Int, key: K, value: V) = set(key, value)
 }
-
-@Serializer(forClass = Collection::class)
-open class CollectionSerializer<T> : KSerializer<Collection<T>> {
-
-    override val descriptor: SerialDescriptor
-        get() = TODO("not implemented")
-
-    override fun serialize(encoder: Encoder, obj: Collection<T>) {
-        TODO("not implemented")
-    }
-
-    override fun deserialize(decoder: Decoder): Collection<T> {
-        TODO("not implemented")
-    }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@Deprecated("Need to rework")
-inline fun <reified T: Any> getC(t: CollectionSerializer<T>): KSerializer<Collection<T>>? {
-    return t.defaultSerializer()
-}
-
-
-
-@PublishedApi
-internal fun <T : Any> CollectionSerializer<T>.defaultSerializer(
-    clazz: KClass<Collection<*>>
-): KSerializer<Collection<T>>? = when (clazz) {
-    List::class -> ListSerializer
-    Set::class -> CharSerializer
-    Map::class -> DoubleSerializer
-    Queue::class -> FloatSerializer
-    else -> null
-} as KSerializer<Collection<T>>?
-
-inline fun <reified T: Any> CollectionSerializer<T>.defaultSerializer(): KSerializer<Collection<T>>? =
-    defaultSerializer(Collection::class)
-
-object ListSerializer : CollectionSerializer<Int>()
-
-object QueueSerializer : CollectionSerializer<Int>()
-
