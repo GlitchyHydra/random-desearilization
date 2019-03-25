@@ -15,6 +15,7 @@ class RandomDecoder : NamedValueDecoder() {
         }
     }
 
+    final override fun decodeTaggedNotNullMark(tag: String): Boolean = Random.nextBoolean()
     final override fun decodeCollectionSize(desc: SerialDescriptor): Int = Random.nextInt(1,1000)
     /**
      * Get random values by decoding
