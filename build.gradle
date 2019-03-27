@@ -14,14 +14,34 @@ buildscript {
 apply plugin: 'kotlin' // or 'kotlin-multiplatform' for multiplatform projects
 apply plugin: 'kotlinx-serialization'
 
+sourceSets {
+    main {
+        kotlin {
+            srcDirs = ['src/main/kotlin']
+        }
+    }
+
+    test {
+        kotlin {
+            srcDirs = ['src/main/tests']
+        }
+    }
+}
+
 repositories {
     jcenter()
     // artifacts are published to this repository
     maven { url "https://kotlin.bintray.com/kotlinx" }
 }
+
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.10.0"
+    testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.3.0'
 }
 
 compileKotlin {

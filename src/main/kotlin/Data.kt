@@ -1,7 +1,8 @@
 import kotlinx.serialization.*
 
-@Serializable()
-data class Data(val l: Set<Int?>, val a: Int?, val b: Char, val c: Short, val d: Byte, val e: A, val g: ProtocolState)
+@Serializable
+data class Data(@Range(0,100) val l: List<Int?>, val a: Int?,
+                @RangeShort(0,100) val b: Char, val c: Short?, val d: Byte, val e: A, val g: ProtocolState)
 
 @Serializable
 data class A(val b: Int, val n: Color)
