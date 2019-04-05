@@ -12,17 +12,18 @@ annotation class RangeShort(val min: Short = Short.MIN_VALUE, val max: Short = S
 @Target(AnnotationTarget.PROPERTY)
 annotation class RangeInt(val min: Int = Int.MIN_VALUE, val max: Int = Int.MAX_VALUE)
 
-/*@SerialInfo
+@SerialInfo
 @Target(AnnotationTarget.PROPERTY)
-annotation class RangeFloat(val min: Float = Float.MIN_VALUE, val max: Float = Float.MAX_VALUE)
+annotation class RangeLong(val min: Long = Long.MIN_VALUE, val max: Long = Long.MAX_VALUE)
 
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
-annotation class RangeDouble(val min: Double = Double.MIN_VALUE, val max: Int = Double.MAX_VALUE)*/
+annotation class RangeFloat(val min: Float = 1.175494351e-38F, val max: Float = 3.402823466e+38F)
 
+@Suppress("FLOAT_LITERAL_CONFORMS_INFINITY")
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
-annotation class Range(val min: Int , val max: Int)
+annotation class RangeDouble(val min: Double = -1.79769313486232E+308, val max: Double = 1.79769313486232E+308)
 
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)

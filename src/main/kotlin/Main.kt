@@ -1,10 +1,11 @@
 import kotlinx.serialization.*
+import kotlin.random.Random
 
 @ImplicitReflectionSerializer
 fun main(args: Array<String>) {
    val customSerializer = Data.serializer()
-   /*for (i in 0..500) {
-      customSerializer.deserialize(RandomDecoder())
-   }
-   println(customSerializer.deserialize(RandomDecoder()))
+   val randomDecoder = RandomDecoder()
+   //println(Random.nextInt(0, 1000))
+   for (i in 0..500) println(customSerializer.deserialize(randomDecoder))
 }
+

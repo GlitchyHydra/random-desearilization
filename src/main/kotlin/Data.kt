@@ -1,8 +1,8 @@
 import kotlinx.serialization.*
 
 @Serializable
-data class Data(@Range(0,100) val l: List<Int?>, val a: Int?,
-                @RangeShort(0,100) val b: Char, val c: Short?, val d: Byte, val e: A, val g: ProtocolState)
+data class Data(@RangeInt(0,100) val l: List<Int?>, val a: Int?, @RangeInt(-11, 10) @RangeDouble(4.3, 15.3) val map: Map<Int, Double>,
+                @RangeChar(0.toChar(),100.toChar()) val b: Char, val c: Short?, val d: Byte, val e: A, val g: ProtocolState)
 
 @Serializable
 data class A(val b: Int, val n: Color)

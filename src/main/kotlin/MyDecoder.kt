@@ -1,89 +1,168 @@
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.EnumDescriptor
-import kotlinx.serialization.internal.SerialClassDescImpl
-import java.util.*
+import java.util.Stack
 import kotlin.random.Random
 import kotlin.random.nextInt
 import kotlin.random.nextLong
 
 open class RandomDecoder : NamedValueDecoder() {
+    private val stackOfAnnotationMap: Stack<Map<String, Annotation?>> = Stack()
     private val source = "ABCDEFGHIJKLMNOPQRSTUVWXYZ \t\n"
-    private val stackOfDescriptors = Stack<SerialDescriptor>()
+    private val mapOfAnnotations: Map<String, Annotation?>
+        get() = stackOfAnnotationMap.peek() //get current map of annotation
+    private val probability: Int get() = Random.nextInt(1..100)
+    private val mapTags = arrayListOf<String>()
+    private var keyOrValue: Boolean = false
 
+    /**
+     * create map with [property, annotation?] entities
+     */
+    private fun createMapOfAnnotations(desc: SerialDescriptor): Map<String, Annotation?> {
+        val mapOfAnnotations = mutableMapOf<String, Annotation?>()
+        for (i in 0 until desc.elementsCount) {
+            val elementName = desc.getElementName(i)
+            val annotationList = desc.getElementAnnotations(i)
+            if (annotationList.size == 2) {
+                mapTags.add(elementName)
+                mapOfAnnotations["$elementName.k"] = annotationList[0]
+                mapOfAnnotations["$elementName.v"] = annotationList[1]
+            } else mapOfAnnotations[elementName] = annotationList.firstOrNull()
+        }
+        return mapOfAnnotations
+    }
+
+    /**
+     * begin structure implementation
+     */
     override fun beginStructure(desc: SerialDescriptor, vararg typeParams: KSerializer<*>): RandomDecoder {
-        if (desc.kind == StructureKind.CLASS) stackOfDescriptors.push(desc)
+        if (desc.kind == StructureKind.CLASS) {
+            val mapOfAnnotations = createMapOfAnnotations(desc)
+            stackOfAnnotationMap.push(mapOfAnnotations)
+        }
         return this
-        /*return when (desc.kind) {
-            StructureKind.LIST -> JsonTreeListInput(json, cast(currentObject))
-            StructureKind.MAP -> JsonTreeMapInput(json, cast(currentObject))
-            else -> JsonTreeInput(json, cast(currentObject))
-        }*/
     }
 
     override fun endStructure(desc: SerialDescriptor) {
-       // val k = getSerialAnnotation(desc
+        if (desc.kind == StructureKind.CLASS) stackOfAnnotationMap.pop()
         super.endStructure(desc)
     }
 
-    final private fun getBooleanWithProbability(probability: Int): Boolean = when(probability) {
-        in 1..80 -> true
+    /**
+     * For generate values with probability
+     * where special cases have more probability then common
+     */
+    private fun getBooleanWithProbability(): Boolean = when (probability) {
+        in 1..70 -> true
         else -> false
     }
 
-    final private fun getCharWithProbability(probability: Int): Char = when(probability) {
-        in 1..80 -> Random.nextInt(0..100).toChar()
-        else -> (Char.MIN_VALUE..Char.MAX_VALUE).random()
+    private fun getCharWithProbability(rangeChar: RangeChar?): Char = when (probability) {
+        in 1..70 -> Random.nextInt(0..100).toChar()
+        else -> {
+            if (rangeChar != null) (rangeChar.min..rangeChar.max).random()
+            else (Short.MIN_VALUE..Short.MAX_VALUE).random().toChar()
+        }
     }
 
-    final private fun getByteWithProbability(probability: Int) : Byte = when(probability) {
-        in 1..80 -> Random.nextInt(-1..1).toByte()
-        else -> (Byte.MIN_VALUE..Byte.MAX_VALUE).random().toByte()
+    private fun getByteWithProbability(rangeByte: RangeByte?): Byte = when (probability) {
+        in 1..70 -> Random.nextInt(-1..1).toByte()
+        else -> {
+            if (rangeByte != null) (rangeByte.min..rangeByte.max).random().toByte()
+            else (Short.MIN_VALUE..Short.MAX_VALUE).random().toByte()
+        }
     }
 
-    final private fun getShortWithProbability(probability: Int) : Short = when(probability) {
-        in 1..80 -> Random.nextInt(-1..1).toShort()
-        else -> (Short.MIN_VALUE..Short.MAX_VALUE).random().toShort()
+    private fun getShortWithProbability(rangeShort: RangeShort?): Short = when (probability) {
+        in 1..70 -> Random.nextInt(-1..1).toShort()
+        else -> {
+            if (rangeShort != null) (rangeShort.min..rangeShort.max).random().toShort()
+            else (Short.MIN_VALUE..Short.MAX_VALUE).random().toShort()
+        }
     }
 
-    final private fun getIntWithProbability(probability: Int) : Int = when(probability) {
-        in 1..80 -> Random.nextInt(-1..1)
-        else -> Random.nextInt()
+    private fun getIntWithProbability(rangeInt: RangeInt?): Int = when (probability) {
+        in 1..70 -> Random.nextInt(-1..1)
+        else -> {
+            if (rangeInt != null) Random.nextInt(rangeInt.min, rangeInt.max)
+            else Random.nextInt()
+        }
     }
 
-    final private fun getLongWithProbability(probability: Int) : Long = when(probability) {
-        in 1..80 -> Random.nextLong(-1L..1L)
-        else -> Random.nextLong()
+    private fun getLongWithProbability(rangeLong: RangeLong?): Long = when (probability) {
+        in 1..70 -> Random.nextLong(-1L..1L)
+        else -> {
+            if (rangeLong != null) Random.nextLong(rangeLong.min, rangeLong.max)
+            else Random.nextLong()
+        }
     }
 
-    final private fun getCurrentRange(tag: String): Annotation? {
-        val index = stackOfDescriptors.getElementIndex(tag)
-        return stackOfDescriptors.getPropertyAnnotation(index)
+
+    private fun getFloatWithProbability(rangeFloat: RangeFloat?): Float = when (probability) {
+        in 1..30 -> Float.POSITIVE_INFINITY
+        in 30..50 -> Float.NaN
+        in 50..70 -> Float.NEGATIVE_INFINITY
+        else -> {
+            if (rangeFloat != null) Random.nextFloat()
+            else Random.nextFloat()
+        }
     }
-    private fun Stack<SerialDescriptor>.getElementIndex(tag: String): Int = this.peek().getElementIndex(tag)
-    private fun Stack<SerialDescriptor>.getPropertyAnnotation(index: Int): Annotation? =
-        this.peek().getElementAnnotations(index).firstOrNull()
 
+    private fun getDoubleWithProbability(rangeDouble: RangeDouble?): Double = when (probability) {
+        in 1..30 -> Double.POSITIVE_INFINITY
+        in 30..50 -> Double.NaN
+        in 50..70 -> Double.NEGATIVE_INFINITY
+        else -> {
+            if (rangeDouble != null) Random.nextDouble(rangeDouble.min, rangeDouble.max)
+            else Random.nextDouble()
+        }
+    }
 
-    final override fun decodeTaggedNotNullMark(tag: String): Boolean = getBooleanWithProbability(Random.nextInt(1,100))
-    final override fun decodeCollectionSize(desc: SerialDescriptor): Int = Random.nextInt(0,1000)
+    override fun decodeTaggedNotNullMark(tag: String): Boolean = getBooleanWithProbability()
+
+    override fun decodeCollectionSize(desc: SerialDescriptor): Int = Random.nextInt(0, 1000)
+
     /**
      * Get random values by decoding
      */
-    final override fun decodeTaggedBoolean(tag: String): Boolean = Random.nextBoolean()
-    final override fun decodeTaggedByte(tag: String): Byte = when(getCurrentRange(tag)) {
-        null -> getByteWithProbability(Random.nextInt(1, 100))
-        else -> getByteWithProbability(Random.nextInt(1, 100))
-    }
-    final override fun decodeTaggedShort(tag: String): Short =
-        getShortWithProbability(Random.nextInt(1, 100))
-    final override fun decodeTaggedInt(tag: String): Int = getIntWithProbability(Random.nextInt(1, 100))
-    final override fun decodeTaggedLong(tag: String): Long = getLongWithProbability(Random.nextInt(1, 100))
-    final override fun decodeTaggedFloat(tag: String): Float = Random.nextFloat()
-    final override fun decodeTaggedDouble(tag: String): Double = Random.nextDouble()
-    final override fun decodeTaggedChar(tag: String): Char = getCharWithProbability(Random.nextInt(1,100))
-    final override fun decodeTaggedString(tag: String): String = (1..100).map { Random.nextInt(0, source.length) }
-        .map { source[it] }.joinToString("")
-    final override fun decodeTaggedEnum(tag: String, enumDescription: EnumDescriptor): Int =
-        Random.nextInt(0,enumDescription.elementsCount - 1)
+    override fun decodeTaggedBoolean(tag: String): Boolean = Random.nextBoolean()
 
+    override fun decodeTaggedByte(tag: String): Byte = getByteWithProbability(mapOfAnnotations[tag] as RangeByte?)
+
+    override fun decodeTaggedShort(tag: String): Short = getShortWithProbability(mapOfAnnotations[tag] as RangeShort?)
+
+    override fun decodeTaggedInt(tag: String): Int = getIntWithProbability(mapOfAnnotations[tag] as RangeInt?)
+
+    override fun decodeTaggedLong(tag: String): Long = getLongWithProbability(mapOfAnnotations[tag] as RangeLong?)
+
+    override fun decodeTaggedFloat(tag: String): Float =
+        getFloatWithProbability(mapOfAnnotations[tag] as RangeFloat?)
+
+    override fun decodeTaggedDouble(tag: String): Double =
+        getDoubleWithProbability(mapOfAnnotations[tag] as RangeDouble?)
+
+    override fun decodeTaggedChar(tag: String): Char = getCharWithProbability(mapOfAnnotations[tag] as RangeChar?)
+
+    override fun decodeTaggedString(tag: String): String = (0..500).map { Random.nextInt(0, source.length) }
+        .map { source[it] }.joinToString("")
+
+    override fun decodeTaggedEnum(tag: String, enumDescription: EnumDescriptor): Int =
+        Random.nextInt(0, enumDescription.elementsCount)
+
+    override fun composeName(parentName: String, childName: String): String {
+        return if (parentName.isEmpty()) childName else {
+            if (mapTags.contains(parentName)) getTagWithModifier(parentName)
+            else parentName
+        }
+    }
+
+    private fun getTagWithModifier(tag: String): String = when {
+        keyOrValue -> {
+            keyOrValue = false
+            "$tag.v"
+        }
+        else -> {
+            keyOrValue = true
+            "$tag.k"
+        }
+    }
 }
