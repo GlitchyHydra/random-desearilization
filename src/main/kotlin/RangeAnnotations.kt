@@ -18,7 +18,7 @@ annotation class RangeLong(val min: Long = Long.MIN_VALUE, val max: Long = Long.
 
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
-annotation class RangeFloat(val min: Float = 1.175494351e-38F, val max: Float = 3.402823466e+38F)
+annotation class RangeFloat(val min: Double = 1.175494351e-38, val max: Double = 3.402823466e+38)
 
 @Suppress("FLOAT_LITERAL_CONFORMS_INFINITY")
 @SerialInfo
@@ -28,3 +28,11 @@ annotation class RangeDouble(val min: Double = -1.79769313486232E+308, val max: 
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
 annotation class RangeChar(val min: Char = Char.MIN_VALUE, val max: Char = Char.MAX_VALUE)
+
+@SerialInfo
+@Target(AnnotationTarget.PROPERTY)
+annotation class RangeEnum(val min: Int = 0, val max: Int = 1)
+
+@SerialInfo
+@Target(AnnotationTarget.PROPERTY)
+annotation class RangeString(val min: Int = 0, val max: Int = 100)
