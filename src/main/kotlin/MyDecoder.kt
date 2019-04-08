@@ -11,6 +11,7 @@ class RandomDecoder(
     private val mapOfAnnotations: Map<String, List<Annotation>>
         get() = stackOfAnnotationMap.peek() //get current map of annotation
     private val probability: Int get() = Random.nextInt(1..100)
+    private val size: Int get() = Random.nextInt(0..1000)
 
     /**
      * create map with [property, annotation?] entities
@@ -114,19 +115,19 @@ class RandomDecoder(
 
 
     private fun getStringWithProbability(rangeString: RangeString?): String = when (probability) {
-        in 1..60 -> List(500) { Random.nextInt(0, 100).toChar() }
+        in 1..60 -> List(size) { Random.nextInt(0, 100).toChar() }
             .joinToString(separator = "", postfix = "", prefix = "")
         else -> {
-            if (rangeString == null) List(500)
+            if (rangeString == null) List(size)
             { Random.nextInt(0, 65535).toChar() }.joinToString(separator = "", postfix = "", prefix = "")
-            else List(500) { Random.nextInt(rangeString.min, rangeString.max).toChar() }
+            else List(size) { Random.nextInt(rangeString.min, rangeString.max).toChar() }
                 .joinToString(separator = "", postfix = "", prefix = "")
         }
     }
 
     override fun decodeTaggedNotNullMark(tag: String): Boolean = getBooleanWithProbability()
 
-    override fun decodeCollectionSize(desc: SerialDescriptor): Int = Random.nextInt(0, 1000)
+    override fun decodeCollectionSize(desc: SerialDescriptor): Int = size
 
     /**
      * Get random values by decoding
