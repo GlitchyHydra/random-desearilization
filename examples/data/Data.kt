@@ -1,12 +1,21 @@
 import BinarySearchTree.BinaryTree
 import kotlinx.serialization.*
 
+@ImplicitReflectionSerializer
 @Serializable
-data class Data(@RangeShort(-153, -1) val c: Short?, @Optional val d: Byte = 3,
-                val e: A, val g: ProtocolState)
+data class Data(@Optional val c: Short? = 3)//, val g: B)
 
 @Serializable
-data class A(@RangeEnum(2,6) val n: Color, val binaryTree: BinarySearchTree.BinaryTree<Int>)
+data class DataTransient(@Transient val c: Short = 3, val b: Int)
+
+@Serializable
+data class OptionalData(val c: Short = 3)
+
+@Serializable
+data class B(@Transient val c: Short? = 3, val b: Int)
+
+@Serializable
+data class A(@RangeEnum(2,6) val n: Color)
 
 @Serializable
 data class BinaryTree(@RangeInt(55,155) val binaryTree: BinaryTree<Int>)

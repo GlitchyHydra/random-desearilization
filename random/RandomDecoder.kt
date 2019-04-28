@@ -2,13 +2,16 @@ import kotlinx.serialization.*
 import kotlinx.serialization.internal.EnumDescriptor
 import kotlin.random.Random
 
-class RandomDecoder(
+class RandomDecoder private constructor(
     private val stackOfAnnotationMap: MutableSet<Map<String, List<Annotation>>> = mutableSetOf()
 ) : NamedValueDecoder() {
+    private var currentIndex = 0
     private val mapOfAnnotations: Map<String, List<Annotation>>?
         get() = stackOfAnnotationMap.lastOrNull() //get current map of annotation
     private val probability: Int get() = Random.nextInt(0,101)
     private val size: Int get() = Random.nextInt(0,1000)
+
+    constructor() : this(mutableSetOf<Map<String, List<Annotation>>>())
 
     /**
      * create map with [property, annotation?] entities
@@ -41,7 +44,7 @@ class RandomDecoder(
     }
 
     /**
-     * For generate values with probability
+     * Generate values with probability
      * where special cases have more probability then common
      */
     private fun getBooleanWithProbability(): Boolean = when (probability) {
@@ -110,8 +113,6 @@ class RandomDecoder(
         }
     }
 
-    private fun List<Char>.joinToString(): String = this.joinToString (separator = "", postfix = "", prefix = "")
-
     private fun getStringWithProbability(rangeString: RangeString?): String = when (probability) {
         in 1..60 -> List(size) { Random.nextInt(0, 100).toChar() }.joinToString()
         else -> {
@@ -123,6 +124,17 @@ class RandomDecoder(
 
     override fun decodeTaggedNotNullMark(tag: String): Boolean = getBooleanWithProbability()
 
+
+    override fun decodeElementIndex(desc: SerialDescriptor): Int {
+        desc.isElementOptional(0)
+        val index = currentIndex
+        currentIndex++
+        return if (index >= desc.elementsCount) CompositeDecoder.READ_DONE
+        else {
+            pushTag(desc.getElementName(index))
+            index
+        }
+    }
 
     override fun decodeCollectionSize(desc: SerialDescriptor): Int = size
 
@@ -168,3 +180,5 @@ class RandomDecoder(
     }
 
 }
+
+fun List<Char>.joinToString(): String = this.joinToString (separator = "", postfix = "", prefix = "")

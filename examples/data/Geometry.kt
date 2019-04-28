@@ -1,5 +1,3 @@
-package DataForTesting
-
 import kotlinx.serialization.Serializable
 import java.lang.Math.*
 
@@ -16,7 +14,11 @@ data class Point(val x: Double, val y: Double) {
      *
      * Рассчитать (по известной формуле) расстояние между двумя точками
      */
-    fun distance(other: Point): Double = Math.sqrt(sqr(x - other.x) + sqr(y - other.y))
+    fun distance(other: Point): Double = Math.sqrt(
+        sqr(x - other.x) + sqr(
+            y - other.y
+        )
+    )
 
 }
 
@@ -64,7 +66,7 @@ class Triangle private constructor(private val points: Set<Point>) {
 
     override fun hashCode() = points.hashCode()
 
-    override fun toString() = "Triangle(a = $a, b = $b, c = $c)"
+    override fun toString() = pointList.size.toString()//"Triangle(a = $a, b = $b, c = $c)"
 }
 
 /**
@@ -139,8 +141,10 @@ fun diameter(vararg points: Point): Segment {
  * Центр её должен находиться посередине между точками, а радиус составлять половину расстояния между ними
  */
 fun circleByDiameter(diameter: Segment): Circle {
-    val center = Point((diameter.end.x + diameter.begin.x) / 2,
-        (diameter.end.y + diameter.begin.y) / 2)
+    val center = Point(
+        (diameter.end.x + diameter.begin.x) / 2,
+        (diameter.end.y + diameter.begin.y) / 2
+    )
     val radius = diameter.begin.distance(diameter.end) / 2
     return Circle(center, radius)
 }
@@ -165,7 +169,8 @@ class Line private constructor(val b: Double, val angle: Double) {
      * Для этого необходимо составить и решить систему из двух уравнений (каждое для своей прямой)
      */
     fun crossPoint(other: Line): Point {
-        val x: Double
+        val x: Double = (other.b / cos(other.angle) - b / cos(angle)) /
+                (sin(angle) / cos(angle) - sin(other.angle) / cos(other.angle))
         val y: Double
         if (angle == PI / 2) {
             y = -b * sin(other.angle) / cos(other.angle) + other.b / cos(other.angle)
@@ -175,8 +180,6 @@ class Line private constructor(val b: Double, val angle: Double) {
             y = -other.b * sin(angle) / cos(angle) + b / cos(angle)
             return Point(-other.b, y)
         }
-        x = (other.b / cos(other.angle) - b / cos(angle)) /
-                (sin(angle) / cos(angle) - sin(other.angle) / cos(other.angle))
         y = x * sin(angle) / cos(angle) + b / cos(angle)
         return Point(x, y)
     }
@@ -197,7 +200,8 @@ class Line private constructor(val b: Double, val angle: Double) {
  *
  * Построить прямую по отрезку
  */
-fun lineBySegment(s: Segment): Line = lineByPoints(s.begin, s.end)
+fun lineBySegment(s: Segment): Line =
+    lineByPoints(s.begin, s.end)
 
 /**
  * Средняя
@@ -217,7 +221,7 @@ fun lineByPoints(a: Point, b: Point): Line {
  */
 fun bisectorByPoints(a: Point, b: Point): Line {
     val point = middlePoint(a, b)
-    if (a.x == b.x) return Line(point,0.0)
+    if (a.x == b.x) return Line(point, 0.0)
     val line = lineByPoints(a, b)
     val angleOfLine = angle(PI / 2 + line.angle)
     return Line(point, angleOfLine)
