@@ -4,6 +4,7 @@ import io.kotlintest.matchers.doubles.shouldBeLessThanOrEqual
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.AnnotationSpec
 import kotlinx.serialization.decode
+import java.lang.Math.atan
 import java.util.ArrayList
 
 val randomDecoder = RandomDecoder()
@@ -32,7 +33,6 @@ class GeometryTests : AnnotationSpec() {
         else area1 shouldBeLessThanOrEqual area2
     }
 
-
     private fun Point.isFinite() = this.x.isFinite() && this.y.isFinite()
     private fun Segment.isFinite() = this.begin.isFinite() && this.end.isFinite()
     private fun Segment.distance() = this.begin.distance(this.end)
@@ -45,25 +45,27 @@ class GeometryTests : AnnotationSpec() {
             circle.radius shouldBeExactly segment.distance() / 2.0
             circle.center.x shouldBeExactly (segment.end.x + segment.begin.x) / 2.0
             circle.center.y shouldBeExactly (segment.end.y + segment.begin.y) / 2.0
-        }
-        else segment.distance().isFinite() shouldBe false
+        } else segment.distance().isFinite() shouldBe false
     }
 
     @Test
     fun lineByPoints() {
         val point1 = pointNew
         val point2 = pointNew
-        3 shouldBe 3
+        if (!point1.isFinite() || !point2.isFinite()) 2 shouldBe 2
+        else {
+            lineByPoints(point1, point2) shouldBe angle(atan((point1.y - point2.y) / (point1.x - point2.x)))
+        }
     }
 
-    fun ArrayList<Circle>.addSorted(circle: Circle) {
+    fun ArrayList<Circle>.addSorted(circle: Circle): Double {
         if (this.isEmpty()) {
             this.add(circle)
-            return
+            return 0.0
         }
         var minIndex = lastIndex
         var min = last().center.distance(circle.center)
-        for (i in 0 until size ) {
+        for (i in 0 until size) {
             val current = this[i].center.distance(circle.center)
             if (current < min) {
                 min = current
@@ -71,6 +73,7 @@ class GeometryTests : AnnotationSpec() {
             }
         }
         add(minIndex, circle)
+        return min
     }
 
     @Test

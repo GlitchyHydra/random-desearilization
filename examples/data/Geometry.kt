@@ -66,7 +66,7 @@ class Triangle private constructor(private val points: Set<Point>) {
 
     override fun hashCode() = points.hashCode()
 
-    override fun toString() = pointList.size.toString()//"Triangle(a = $a, b = $b, c = $c)"
+    override fun toString() = "Triangle(a = $a, b = $b, c = $c)"
 }
 
 /**
