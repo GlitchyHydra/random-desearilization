@@ -1,15 +1,15 @@
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.EnumDescriptor
+import java.lang.StringBuilder
 import kotlin.random.Random
 
 class RandomDecoder private constructor(
     private val stackOfAnnotationMap: MutableSet<Map<String, List<Annotation>>> = mutableSetOf()
 ) : NamedValueDecoder() {
-    private var currentIndex = 0
     private val mapOfAnnotations: Map<String, List<Annotation>>?
         get() = stackOfAnnotationMap.lastOrNull() //get current map of annotation
-    private val probability: Int get() = Random.nextInt(0,101)
-    private val size: Int get() = Random.nextInt(0,1000)
+    private val probability: Int get() = Random.nextInt(1, 101)
+    private val size: Int get() = Random.nextInt(0, 1001)
 
     constructor() : this(mutableSetOf<Map<String, List<Annotation>>>())
 
@@ -48,55 +48,47 @@ class RandomDecoder private constructor(
      * where special cases have more probability then common
      */
     private fun getBooleanWithProbability(): Boolean = when (probability) {
-        in 0..69 -> true
+        in 1..70 -> true
         else -> false
     }
 
-    private fun getCharWithProbability(rangeChar: RangeChar?): Char = when (probability) {
-        in 0..69 -> Random.nextInt(0,100).toChar()
-        else -> {
-            if (rangeChar == null) (Short.MIN_VALUE..Short.MAX_VALUE).random().toChar()
-            else (rangeChar.min..rangeChar.max).random()
-        }
+    private fun getCharWithProbability(rangeChar: RangeChar?): Char = when {
+        probability in 1..70 -> Random.nextInt(0, 100).toChar()
+        rangeChar == null -> Random.nextInt(0, 65535).toChar()
+        else -> (rangeChar.min..rangeChar.max).random()
     }
 
-    private fun getByteWithProbability(rangeByte: RangeByte?): Byte = when (probability) {
-        in 0..69 -> Random.nextInt(-1,2).toByte()
-        else -> {
-            if (rangeByte == null) (Short.MIN_VALUE..Short.MAX_VALUE).random().toByte()
-            else (rangeByte.min..rangeByte.max).random().toByte()
-        }
+    private fun getByteWithProbability(rangeByte: RangeByte?): Byte = when {
+        probability in 1..70 -> Random.nextInt(-1, 2).toByte()
+        rangeByte == null -> (Short.MIN_VALUE..Short.MAX_VALUE).random().toByte()
+        else -> (rangeByte.min..rangeByte.max).random().toByte()
     }
 
-    private fun getShortWithProbability(rangeShort: RangeShort?): Short = when (probability) {
-        in 0..69 -> Random.nextInt(-1,2).toShort()
-        else -> {
-            if (rangeShort == null) (Short.MIN_VALUE..Short.MAX_VALUE).random().toShort()
-            else (rangeShort.min..rangeShort.max).random().toShort()
-        }
+    private fun getShortWithProbability(rangeShort: RangeShort?): Short = when {
+        probability in 1..70 -> Random.nextInt(-1, 2).toShort()
+        rangeShort == null -> (Short.MIN_VALUE..Short.MAX_VALUE).random().toShort()
+        else -> (rangeShort.min..rangeShort.max).random().toShort()
     }
 
-    private fun getIntWithProbability(rangeInt: RangeInt?): Int = when (probability) {
-        in 0..69 -> Random.nextInt(-1,2)
-        else -> {
-            if (rangeInt == null) Random.nextInt()
-            else Random.nextInt(rangeInt.min, rangeInt.max)
-        }
+
+    private fun getIntWithProbability(rangeInt: RangeInt?): Int = when {
+        probability in 1..70 -> Random.nextInt(-1, 2)
+        rangeInt == null -> Random.nextInt()
+        else -> Random.nextInt(rangeInt.min, rangeInt.max)
     }
 
-    private fun getLongWithProbability(rangeLong: RangeLong?): Long = when (probability) {
-        in 0..69 -> Random.nextLong(-1L,2L)
-        else -> {
-            if (rangeLong == null) Random.nextLong()
-            else Random.nextLong(rangeLong.min, rangeLong.max)
-        }
+
+    private fun getLongWithProbability(rangeLong: RangeLong?): Long = when {
+        probability in 1..70 -> Random.nextLong(-1L, 2L)
+        rangeLong == null -> Random.nextLong()
+        else -> Random.nextLong(rangeLong.min, rangeLong.max)
     }
 
 
     private fun getFloatWithProbability(rangeFloat: RangeFloat?): Float = when (probability) {
-        in 0..19 -> Float.POSITIVE_INFINITY
-        in 20..39 -> Float.NaN
-        in 40..59 -> Float.NEGATIVE_INFINITY
+        in 1..20 -> Float.POSITIVE_INFINITY
+        in 21..40 -> Float.NaN
+        in 41..60 -> Float.NEGATIVE_INFINITY
         else -> {
             if (rangeFloat == null) Random.nextFloat()
             else Random.nextDouble(rangeFloat.min, rangeFloat.max).toFloat()
@@ -104,37 +96,30 @@ class RandomDecoder private constructor(
     }
 
     private fun getDoubleWithProbability(rangeDouble: RangeDouble?): Double = when (probability) {
-        in 0..19 -> Double.POSITIVE_INFINITY
-        in 20..39 -> Double.NaN
-        in 40..59 -> Double.NEGATIVE_INFINITY
+        in 1..20 -> Double.POSITIVE_INFINITY
+        in 21..40 -> Double.NaN
+        in 41..60 -> Double.NEGATIVE_INFINITY
         else -> {
             if (rangeDouble == null) Random.nextDouble()
             else Random.nextDouble(rangeDouble.min, rangeDouble.max)
         }
     }
 
-    private fun getStringWithProbability(rangeString: RangeString?): String = when (probability) {
-        in 1..60 -> List(size) { Random.nextInt(0, 100).toChar() }.joinToString()
-        else -> {
-            if (rangeString == null) List(size)
-            { Random.nextInt(0, 65535).toChar() }.joinToString()
-            else List(size) { Random.nextInt(rangeString.min, rangeString.max).toChar() }.joinToString()
-        }
+    private fun stringRandomly(from: Int, to: Int): String {
+        val line = StringBuilder()
+        (0..size).map { line.append(Random.nextInt(from, to).toChar()) }
+        return line.toString()
     }
+
+    private fun getStringWithProbability(rangeString: RangeString?): String =
+        when {
+            probability in 1..60 -> stringRandomly(0, 100)
+            rangeString == null -> stringRandomly(0, 65535)
+            else -> stringRandomly(rangeString.min, rangeString.max)
+        }
+
 
     override fun decodeTaggedNotNullMark(tag: String): Boolean = getBooleanWithProbability()
-
-
-    override fun decodeElementIndex(desc: SerialDescriptor): Int {
-        desc.isElementOptional(0)
-        val index = currentIndex
-        currentIndex++
-        return if (index >= desc.elementsCount) CompositeDecoder.READ_DONE
-        else {
-            pushTag(desc.getElementName(index))
-            index
-        }
-    }
 
     override fun decodeCollectionSize(desc: SerialDescriptor): Int = size
 
@@ -180,5 +165,3 @@ class RandomDecoder private constructor(
     }
 
 }
-
-fun List<Char>.joinToString(): String = this.joinToString (separator = "", postfix = "", prefix = "")
