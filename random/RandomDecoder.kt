@@ -157,7 +157,7 @@ class RandomDecoder private constructor(
         val rangeEnum = mapOfAnnotations?.get(tag)?.find { it is RangeEnum } as RangeEnum?
         return if (rangeEnum == null || rangeEnum.min !in checkRange || rangeEnum.max !in checkRange)
             Random.nextInt(0, enumDescription.elementsCount)
-        else Random.nextInt(rangeEnum.min, rangeEnum.max)
+        else Random.nextInt(rangeEnum.min - 1, rangeEnum.max)
     }
 
     override fun composeName(parentName: String, childName: String): String {
