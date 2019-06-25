@@ -12,6 +12,7 @@ import java.util.*
 
 class BinaryTreeTests : AnnotationSpec() {
 
+    private val randomDecoder = RandomDecoder()
     private val dataSerializer = BinaryTree.serializer()
     private var newBinaryTree = dataSerializer.deserialize(randomDecoder).binaryTree
 
