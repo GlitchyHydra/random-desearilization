@@ -10,10 +10,10 @@ To use it in your project write this code
 Generator will give you a specific values in common.
 - empty collections;
 - -1, 0, 1 in Int, Short, Long; 
-- nan, infinity in Double, Float;
-- english alphabet characters in chars.
+- infinity, NaN in Double, Float;
+- english alphabet characters in chars and strings.
 
-Also you can generate random values in specific range by setting a annotation to your properties in class like this.
+Also you can generate random values in specific range by setting an annotation to your properties in class like this.
 ```
 @Serializable
 data class BinaryTree(@RangeInt(55,155) val binaryTree: BinaryTree<Int>)
