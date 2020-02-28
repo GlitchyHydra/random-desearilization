@@ -1,5 +1,5 @@
 # Random generator by deserialization using Kotlinx-Serialization library
-If you need a random generator for your clasess, use this decoder.
+If you need a random generator for your propery - based tests, use this decoder.
 It's a random decoder, that you can give to deserialize method of your class serializer.
 It will generate object with random values in it. 
 To use it in your project write this code
