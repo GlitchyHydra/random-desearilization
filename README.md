@@ -7,7 +7,7 @@ To use it in your project write this code
     val randomDecoder = RandomDecoder()
     val myObject = randomDecoder.decode(DataTransient.serializer())
 ```
-Generator will give you a specific values in common.
+Generator will give you these values in common to test specific cases.
 - empty collections;
 - -1, 0, 1 in Int, Short, Long; 
 - infinity, NaN in Double, Float;
